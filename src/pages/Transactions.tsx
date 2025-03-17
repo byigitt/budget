@@ -1,5 +1,5 @@
-import { useState, useMemo } from 'react';
-import { PlusIcon, ArrowDownIcon, ArrowUpIcon } from '@heroicons/react/24/outline';
+import { useState, useMemo, useRef, useEffect } from 'react';
+import { PlusIcon, ArrowDownIcon, ArrowUpIcon, FunnelIcon, XMarkIcon, MagnifyingGlassIcon, CalendarIcon, ChevronDownIcon } from '@heroicons/react/24/outline';
 import { useAppContext } from '../contexts/AppContext';
 import Card from '../components/UI/Card';
 import TransactionList from '../components/Transactions/TransactionList';
@@ -9,6 +9,90 @@ import { Transaction } from '../types';
 // Type for sorting options
 type SortOption = 'date' | 'amount' | 'description';
 type SortDirection = 'asc' | 'desc';
+
+// Custom dropdown component
+interface DropdownOption {
+  value: string;
+  label: string;
+}
+
+interface CustomDropdownProps {
+  options: DropdownOption[];
+  value: string;
+  onChange: (value: string) => void;
+  label: string;
+  id: string;
+}
+
+function CustomDropdown({ options, value, onChange, label, id }: CustomDropdownProps) {
+  const [isOpen, setIsOpen] = useState(false);
+  const dropdownRef = useRef<HTMLDivElement>(null);
+  
+  const selectedOption = options.find(option => option.value === value) || options[0];
+  
+  // Close dropdown when clicking outside
+  useEffect(() => {
+    function handleClickOutside(event: MouseEvent) {
+      if (dropdownRef.current && !dropdownRef.current.contains(event.target as Node)) {
+        setIsOpen(false);
+      }
+    }
+    
+    document.addEventListener('mousedown', handleClickOutside);
+    return () => {
+      document.removeEventListener('mousedown', handleClickOutside);
+    };
+  }, []);
+  
+  return (
+    <div className="space-y-2">
+      <label htmlFor={id} className="block text-sm font-medium text-gray-300">
+        {label}
+      </label>
+      <div className="relative" ref={dropdownRef}>
+        <button
+          type="button"
+          id={id}
+          onClick={() => setIsOpen(!isOpen)}
+          className="py-3 px-4 block w-full text-left rounded-lg border-0 bg-gray-700 text-white focus:ring-1 focus:ring-primary-500 shadow-sm"
+          aria-haspopup="listbox"
+          aria-expanded={isOpen}
+        >
+          <div className="flex items-center justify-between">
+            <span>{selectedOption.label}</span>
+            <ChevronDownIcon className="h-5 w-5 text-gray-400" />
+          </div>
+        </button>
+        
+        {isOpen && (
+          <div className="absolute z-10 mt-1 w-full rounded-md bg-gray-800 shadow-lg">
+            <ul 
+              className="max-h-60 overflow-auto rounded-md py-1 text-base focus:outline-none sm:text-sm"
+              tabIndex={-1}
+              role="listbox"
+            >
+              {options.map((option) => (
+                <li
+                  key={option.value}
+                  role="option"
+                  className={`cursor-pointer select-none relative py-3 px-4 hover:bg-blue-600 ${
+                    option.value === value ? 'bg-blue-500 text-white' : 'text-gray-200'
+                  }`}
+                  onClick={() => {
+                    onChange(option.value);
+                    setIsOpen(false);
+                  }}
+                >
+                  {option.label}
+                </li>
+              ))}
+            </ul>
+          </div>
+        )}
+      </div>
+    </div>
+  );
+}
 
 export default function Transactions() {
   const { transactions, categories, accounts, addTransaction, updateTransaction, deleteTransaction } = useAppContext();
@@ -153,10 +237,15 @@ export default function Transactions() {
     }
   };
   
+  // Add a handler for custom dropdowns
+  const handleDropdownChange = (key: keyof typeof filters, value: string) => {
+    handleFilterChange(key, value);
+  };
+  
   return (
     <div className="space-y-6">
       <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4">
-        <h1 className="text-2xl font-bold text-gray-900 dark:text-white">Transactions</h1>
+        <h1 className="text-2xl font-bold text-gray-900 dark:text-white mt-4">Transactions</h1>
         <button
           type="button"
           onClick={() => handleOpenModal()}
@@ -168,122 +257,202 @@ export default function Transactions() {
       </div>
       
       {/* Filters */}
-      <Card>
-        <div className="p-4">
-          <div className="flex flex-col sm:flex-row justify-between mb-4">
-            <h2 className="text-lg font-medium mb-2 sm:mb-0">Filters</h2>
+      <Card className="bg-gray-800 text-white border-0">
+        <div className="p-5">
+          <div className="flex flex-col sm:flex-row justify-between items-center mb-6 pb-3 border-b border-gray-700">
+            <div className="flex items-center">
+              <FunnelIcon className="h-5 w-5 mr-2 text-gray-400" />
+              <h2 className="text-lg font-medium">Filters</h2>
+            </div>
             {Object.values(filters).some(value => 
               value !== '' && value !== 'all'
             ) && (
               <button
                 onClick={clearFilters}
-                className="text-sm text-primary-600 hover:text-primary-700"
+                className="mt-2 sm:mt-0 text-sm flex items-center text-primary-400 hover:text-primary-300"
               >
+                <XMarkIcon className="h-4 w-4 mr-1" />
                 Clear filters
               </button>
             )}
           </div>
           
-          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
             {/* Search input */}
-            <div>
-              <label htmlFor="search" className="block text-sm font-medium text-gray-700 dark:text-gray-300">
+            <div className="space-y-2">
+              <label htmlFor="search" className="block text-sm font-medium text-gray-300">
                 Search
               </label>
-              <input
-                type="text"
-                id="search"
-                value={filters.search}
-                onChange={(e) => handleFilterChange('search', e.target.value)}
-                placeholder="Search transactions..."
-                className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-primary-500 focus:ring-primary-500 dark:bg-gray-700 dark:border-gray-600 dark:text-white"
-              />
+              <div className="relative">
+                <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
+                  <MagnifyingGlassIcon className="h-5 w-5 text-gray-500" />
+                </div>
+                <input
+                  type="text"
+                  id="search"
+                  value={filters.search}
+                  onChange={(e) => handleFilterChange('search', e.target.value)}
+                  placeholder="Search transactions..."
+                  className="pl-10 py-3 block w-full rounded-lg border-0 bg-gray-700 text-white placeholder-gray-400 focus:ring-1 focus:ring-primary-500 shadow-sm"
+                />
+              </div>
             </div>
             
-            {/* Transaction type filter */}
-            <div>
-              <label htmlFor="type" className="block text-sm font-medium text-gray-700 dark:text-gray-300">
-                Type
-              </label>
-              <select
-                id="type"
-                value={filters.type}
-                onChange={(e) => handleFilterChange('type', e.target.value)}
-                className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-primary-500 focus:ring-primary-500 dark:bg-gray-700 dark:border-gray-600 dark:text-white"
-              >
-                <option value="all">All types</option>
-                <option value="income">Income</option>
-                <option value="expense">Expense</option>
-              </select>
-            </div>
+            {/* Filter by type with custom dropdown */}
+            <CustomDropdown
+              id="type"
+              label="Transaction Type"
+              value={filters.type}
+              onChange={(value) => handleDropdownChange('type', value)}
+              options={[
+                { value: 'all', label: 'All types' },
+                { value: 'income', label: 'Income' },
+                { value: 'expense', label: 'Expense' },
+              ]}
+            />
             
-            {/* Category filter */}
-            <div>
-              <label htmlFor="category" className="block text-sm font-medium text-gray-700 dark:text-gray-300">
-                Category
-              </label>
-              <select
-                id="category"
-                value={filters.category}
-                onChange={(e) => handleFilterChange('category', e.target.value)}
-                className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-primary-500 focus:ring-primary-500 dark:bg-gray-700 dark:border-gray-600 dark:text-white"
-              >
-                <option value="all">All categories</option>
-                {categories.map(category => (
-                  <option key={category.id} value={category.id}>
-                    {category.name}
-                  </option>
-                ))}
-              </select>
-            </div>
+            {/* Filter by category with custom dropdown */}
+            <CustomDropdown
+              id="category"
+              label="Category"
+              value={filters.category}
+              onChange={(value) => handleDropdownChange('category', value)}
+              options={[
+                { value: 'all', label: 'All categories' },
+                ...categories.map(category => ({
+                  value: category.id,
+                  label: category.name
+                }))
+              ]}
+            />
             
-            {/* Account filter */}
-            <div>
-              <label htmlFor="account" className="block text-sm font-medium text-gray-700 dark:text-gray-300">
-                Account
-              </label>
-              <select
-                id="account"
-                value={filters.account}
-                onChange={(e) => handleFilterChange('account', e.target.value)}
-                className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-primary-500 focus:ring-primary-500 dark:bg-gray-700 dark:border-gray-600 dark:text-white"
-              >
-                <option value="all">All accounts</option>
-                {accounts.map(account => (
-                  <option key={account.id} value={account.id}>
-                    {account.name}
-                  </option>
-                ))}
-              </select>
-            </div>
+            {/* Filter by account with custom dropdown */}
+            <CustomDropdown
+              id="account"
+              label="Account"
+              value={filters.account}
+              onChange={(value) => handleDropdownChange('account', value)}
+              options={[
+                { value: 'all', label: 'All accounts' },
+                ...accounts.map(account => ({
+                  value: account.id,
+                  label: account.name
+                }))
+              ]}
+            />
             
             {/* Date range filters */}
-            <div>
-              <label htmlFor="startDate" className="block text-sm font-medium text-gray-700 dark:text-gray-300">
-                From
+            <div className="space-y-2">
+              <label htmlFor="startDate" className="block text-sm font-medium text-gray-300">
+                From Date
               </label>
-              <input
-                type="date"
-                id="startDate"
-                value={filters.startDate}
-                onChange={(e) => handleFilterChange('startDate', e.target.value)}
-                className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-primary-500 focus:ring-primary-500 dark:bg-gray-700 dark:border-gray-600 dark:text-white"
-              />
+              <div className="relative">
+                <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
+                  <CalendarIcon className="h-5 w-5 text-gray-500" />
+                </div>
+                <input
+                  type="date"
+                  id="startDate"
+                  value={filters.startDate}
+                  onChange={(e) => handleFilterChange('startDate', e.target.value)}
+                  className="pl-10 py-3 block w-full rounded-lg border-0 bg-gray-700 text-white focus:ring-1 focus:ring-primary-500 shadow-sm"
+                />
+              </div>
             </div>
             
-            <div>
-              <label htmlFor="endDate" className="block text-sm font-medium text-gray-700 dark:text-gray-300">
-                To
+            <div className="space-y-2">
+              <label htmlFor="endDate" className="block text-sm font-medium text-gray-300">
+                To Date
               </label>
-              <input
-                type="date"
-                id="endDate"
-                value={filters.endDate}
-                onChange={(e) => handleFilterChange('endDate', e.target.value)}
-                className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-primary-500 focus:ring-primary-500 dark:bg-gray-700 dark:border-gray-600 dark:text-white"
-              />
+              <div className="relative">
+                <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
+                  <CalendarIcon className="h-5 w-5 text-gray-500" />
+                </div>
+                <input
+                  type="date"
+                  id="endDate"
+                  value={filters.endDate}
+                  onChange={(e) => handleFilterChange('endDate', e.target.value)}
+                  className="pl-10 py-3 block w-full rounded-lg border-0 bg-gray-700 text-white focus:ring-1 focus:ring-primary-500 shadow-sm"
+                />
+              </div>
             </div>
           </div>
+          
+          {/* Active filters */}
+          {Object.values(filters).some(value => value !== '' && value !== 'all') && (
+            <div className="mt-6 pt-4 border-t border-gray-700">
+              <div className="flex flex-wrap gap-2 items-center">
+                <span className="text-sm text-gray-400">Active filters:</span>
+                {filters.type !== 'all' && (
+                  <span className="inline-flex items-center px-3 py-1.5 rounded-full text-xs font-medium bg-gray-700 text-gray-200">
+                    Type: {filters.type}
+                    <button 
+                      onClick={() => handleFilterChange('type', 'all')}
+                      className="ml-1.5 text-gray-400 hover:text-gray-200"
+                    >
+                      <XMarkIcon className="h-3.5 w-3.5" />
+                    </button>
+                  </span>
+                )}
+                {filters.category !== 'all' && (
+                  <span className="inline-flex items-center px-3 py-1.5 rounded-full text-xs font-medium bg-gray-700 text-gray-200">
+                    Category: {categories.find(c => c.id === filters.category)?.name || 'Unknown'}
+                    <button 
+                      onClick={() => handleFilterChange('category', 'all')}
+                      className="ml-1.5 text-gray-400 hover:text-gray-200"
+                    >
+                      <XMarkIcon className="h-3.5 w-3.5" />
+                    </button>
+                  </span>
+                )}
+                {filters.account !== 'all' && (
+                  <span className="inline-flex items-center px-3 py-1.5 rounded-full text-xs font-medium bg-gray-700 text-gray-200">
+                    Account: {accounts.find(a => a.id === filters.account)?.name || 'Unknown'}
+                    <button 
+                      onClick={() => handleFilterChange('account', 'all')}
+                      className="ml-1.5 text-gray-400 hover:text-gray-200"
+                    >
+                      <XMarkIcon className="h-3.5 w-3.5" />
+                    </button>
+                  </span>
+                )}
+                {filters.startDate && (
+                  <span className="inline-flex items-center px-3 py-1.5 rounded-full text-xs font-medium bg-gray-700 text-gray-200">
+                    From: {filters.startDate}
+                    <button 
+                      onClick={() => handleFilterChange('startDate', '')}
+                      className="ml-1.5 text-gray-400 hover:text-gray-200"
+                    >
+                      <XMarkIcon className="h-3.5 w-3.5" />
+                    </button>
+                  </span>
+                )}
+                {filters.endDate && (
+                  <span className="inline-flex items-center px-3 py-1.5 rounded-full text-xs font-medium bg-gray-700 text-gray-200">
+                    To: {filters.endDate}
+                    <button 
+                      onClick={() => handleFilterChange('endDate', '')}
+                      className="ml-1.5 text-gray-400 hover:text-gray-200"
+                    >
+                      <XMarkIcon className="h-3.5 w-3.5" />
+                    </button>
+                  </span>
+                )}
+                {filters.search && (
+                  <span className="inline-flex items-center px-3 py-1.5 rounded-full text-xs font-medium bg-gray-700 text-gray-200">
+                    Search: "{filters.search}"
+                    <button 
+                      onClick={() => handleFilterChange('search', '')}
+                      className="ml-1.5 text-gray-400 hover:text-gray-200"
+                    >
+                      <XMarkIcon className="h-3.5 w-3.5" />
+                    </button>
+                  </span>
+                )}
+              </div>
+            </div>
+          )}
         </div>
       </Card>
       

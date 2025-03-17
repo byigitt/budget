@@ -1,5 +1,5 @@
 import { useState, useEffect } from 'react';
-import { XMarkIcon, PlusIcon } from '@heroicons/react/24/outline';
+import { XMarkIcon, PlusIcon, CalendarIcon } from '@heroicons/react/24/outline';
 import { useAppContext } from '../../contexts/AppContext';
 import { Transaction } from '../../types';
 
@@ -146,39 +146,41 @@ export default function TransactionForm({ transaction, onSubmit, onCancel }: Tra
   };
   
   return (
-    <form onSubmit={handleSubmit} className="space-y-6">
+    <form onSubmit={handleSubmit} className="space-y-6 bg-gray-800 text-white p-6 rounded-lg">
+      <h2 className="text-xl font-semibold mb-4">Add Transaction</h2>
+      
       {/* Transaction Type */}
-      <div>
-        <label className="block text-sm font-medium mb-1">Transaction Type</label>
-        <div className="flex space-x-4">
-          <label className="inline-flex items-center">
+      <div className="space-y-3">
+        <label className="block text-sm font-medium text-gray-300">Transaction Type</label>
+        <div className="flex gap-4">
+          <label className={`flex items-center justify-center px-4 py-2 rounded-lg cursor-pointer transition-colors ${form.type === 'expense' ? 'bg-red-600 text-white' : 'bg-gray-700 text-gray-300'}`}>
             <input
               type="radio"
               name="type"
               value="expense"
               checked={form.type === 'expense'}
               onChange={handleChange}
-              className="text-primary-600 focus:ring-primary-500 h-4 w-4"
+              className="sr-only"
             />
-            <span className="ml-2 text-gray-700 dark:text-gray-300">Expense</span>
+            <span>Expense</span>
           </label>
-          <label className="inline-flex items-center">
+          <label className={`flex items-center justify-center px-4 py-2 rounded-lg cursor-pointer transition-colors ${form.type === 'income' ? 'bg-green-600 text-white' : 'bg-gray-700 text-gray-300'}`}>
             <input
               type="radio"
               name="type"
               value="income"
               checked={form.type === 'income'}
               onChange={handleChange}
-              className="text-primary-600 focus:ring-primary-500 h-4 w-4"
+              className="sr-only"
             />
-            <span className="ml-2 text-gray-700 dark:text-gray-300">Income</span>
+            <span>Income</span>
           </label>
         </div>
       </div>
       
       {/* Description */}
-      <div>
-        <label htmlFor="description" className="block text-sm font-medium mb-1">
+      <div className="space-y-2">
+        <label htmlFor="description" className="block text-sm font-medium text-gray-300">
           Description
         </label>
         <input
@@ -187,16 +189,17 @@ export default function TransactionForm({ transaction, onSubmit, onCancel }: Tra
           name="description"
           value={form.description}
           onChange={handleChange}
-          className={`block w-full rounded-md border-gray-300 shadow-sm focus:border-primary-500 focus:ring-primary-500 dark:bg-gray-700 dark:border-gray-600 dark:text-white ${errors.description ? 'border-red-300 text-red-900 placeholder-red-300 focus:border-red-500 focus:ring-red-500' : ''}`}
+          placeholder="What was this transaction for?"
+          className={`py-3 px-4 block w-full rounded-lg border-0 bg-gray-700 text-white placeholder-gray-400 focus:ring-1 focus:ring-primary-500 shadow-sm ${errors.description ? 'ring-1 ring-red-500' : ''}`}
         />
         {errors.description && (
-          <p className="mt-1 text-sm text-red-600">{errors.description}</p>
+          <p className="mt-1 text-sm text-red-400">{errors.description}</p>
         )}
       </div>
       
       {/* Amount */}
-      <div>
-        <label htmlFor="amount" className="block text-sm font-medium mb-1">
+      <div className="space-y-2">
+        <label htmlFor="amount" className="block text-sm font-medium text-gray-300">
           Amount
         </label>
         <input
@@ -205,84 +208,106 @@ export default function TransactionForm({ transaction, onSubmit, onCancel }: Tra
           name="amount"
           value={form.amount}
           onChange={handleChange}
+          placeholder="0.00"
           min="0"
           step="0.01"
-          className={`block w-full rounded-md border-gray-300 shadow-sm focus:border-primary-500 focus:ring-primary-500 dark:bg-gray-700 dark:border-gray-600 dark:text-white ${errors.amount ? 'border-red-300 text-red-900 placeholder-red-300 focus:border-red-500 focus:ring-red-500' : ''}`}
+          className={`py-3 px-4 block w-full rounded-lg border-0 bg-gray-700 text-white placeholder-gray-400 focus:ring-1 focus:ring-primary-500 shadow-sm ${errors.amount ? 'ring-1 ring-red-500' : ''}`}
         />
         {errors.amount && (
-          <p className="mt-1 text-sm text-red-600">{errors.amount}</p>
+          <p className="mt-1 text-sm text-red-400">{errors.amount}</p>
         )}
       </div>
       
       {/* Date */}
-      <div>
-        <label htmlFor="date" className="block text-sm font-medium mb-1">
+      <div className="space-y-2">
+        <label htmlFor="date" className="block text-sm font-medium text-gray-300">
           Date
         </label>
-        <input
-          type="date"
-          id="date"
-          name="date"
-          value={form.date}
-          onChange={handleChange}
-          className={`block w-full rounded-md border-gray-300 shadow-sm focus:border-primary-500 focus:ring-primary-500 dark:bg-gray-700 dark:border-gray-600 dark:text-white ${errors.date ? 'border-red-300 text-red-900 placeholder-red-300 focus:border-red-500 focus:ring-red-500' : ''}`}
-        />
+        <div className="relative">
+          <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
+            <CalendarIcon className="h-5 w-5 text-gray-500" />
+          </div>
+          <input
+            type="date"
+            id="date"
+            name="date"
+            value={form.date}
+            onChange={handleChange}
+            className={`pl-10 py-3 block w-full rounded-lg border-0 bg-gray-700 text-white focus:ring-1 focus:ring-primary-500 shadow-sm ${errors.date ? 'ring-1 ring-red-500' : ''}`}
+          />
+        </div>
         {errors.date && (
-          <p className="mt-1 text-sm text-red-600">{errors.date}</p>
+          <p className="mt-1 text-sm text-red-400">{errors.date}</p>
         )}
       </div>
       
-      {/* Category */}
-      <div>
-        <label htmlFor="categoryId" className="block text-sm font-medium mb-1">
-          Category
-        </label>
-        <select
-          id="categoryId"
-          name="categoryId"
-          value={form.categoryId}
-          onChange={handleChange}
-          className={`block w-full rounded-md border-gray-300 shadow-sm focus:border-primary-500 focus:ring-primary-500 dark:bg-gray-700 dark:border-gray-600 dark:text-white ${errors.categoryId ? 'border-red-300 text-red-900 placeholder-red-300 focus:border-red-500 focus:ring-red-500' : ''}`}
-        >
-          <option value="">Select a category</option>
-          {filteredCategories.map(category => (
-            <option key={category.id} value={category.id}>
-              {category.name}
-            </option>
-          ))}
-        </select>
-        {errors.categoryId && (
-          <p className="mt-1 text-sm text-red-600">{errors.categoryId}</p>
-        )}
-      </div>
-      
-      {/* Account */}
-      <div>
-        <label htmlFor="accountId" className="block text-sm font-medium mb-1">
-          Account
-        </label>
-        <select
-          id="accountId"
-          name="accountId"
-          value={form.accountId}
-          onChange={handleChange}
-          className={`block w-full rounded-md border-gray-300 shadow-sm focus:border-primary-500 focus:ring-primary-500 dark:bg-gray-700 dark:border-gray-600 dark:text-white ${errors.accountId ? 'border-red-300 text-red-900 placeholder-red-300 focus:border-red-500 focus:ring-red-500' : ''}`}
-        >
-          <option value="">Select an account</option>
-          {accounts.map(account => (
-            <option key={account.id} value={account.id}>
-              {account.name}
-            </option>
-          ))}
-        </select>
-        {errors.accountId && (
-          <p className="mt-1 text-sm text-red-600">{errors.accountId}</p>
-        )}
+      <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+        {/* Category */}
+        <div className="space-y-2">
+          <label htmlFor="categoryId" className="block text-sm font-medium text-gray-300">
+            Category
+          </label>
+          <div className="relative">
+            <select
+              id="categoryId"
+              name="categoryId"
+              value={form.categoryId}
+              onChange={handleChange}
+              className={`py-3 px-4 block w-full appearance-none rounded-lg border-0 bg-gray-700 text-white focus:ring-1 focus:ring-primary-500 shadow-sm pr-10 ${errors.categoryId ? 'ring-1 ring-red-500' : ''}`}
+            >
+              <option value="">Select a category</option>
+              {filteredCategories.map(category => (
+                <option key={category.id} value={category.id}>
+                  {category.name}
+                </option>
+              ))}
+            </select>
+            <div className="pointer-events-none absolute inset-y-0 right-0 flex items-center px-3 text-gray-500">
+              <svg className="h-5 w-5" viewBox="0 0 20 20" fill="currentColor" aria-hidden="true">
+                <path fillRule="evenodd" d="M5.23 7.21a.75.75 0 011.06.02L10 11.168l3.71-3.938a.75.75 0 111.08 1.04l-4.25 4.5a.75.75 0 01-1.08 0l-4.25-4.5a.75.75 0 01.02-1.06z" clipRule="evenodd" />
+              </svg>
+            </div>
+          </div>
+          {errors.categoryId && (
+            <p className="mt-1 text-sm text-red-400">{errors.categoryId}</p>
+          )}
+        </div>
+        
+        {/* Account */}
+        <div className="space-y-2">
+          <label htmlFor="accountId" className="block text-sm font-medium text-gray-300">
+            Account
+          </label>
+          <div className="relative">
+            <select
+              id="accountId"
+              name="accountId"
+              value={form.accountId}
+              onChange={handleChange}
+              className={`py-3 px-4 block w-full appearance-none rounded-lg border-0 bg-gray-700 text-white focus:ring-1 focus:ring-primary-500 shadow-sm pr-10 ${errors.accountId ? 'ring-1 ring-red-500' : ''}`}
+            >
+              <option value="">Select an account</option>
+              {accounts.map(account => (
+                <option key={account.id} value={account.id}>
+                  {account.name}
+                </option>
+              ))}
+            </select>
+            <div className="pointer-events-none absolute inset-y-0 right-0 flex items-center px-3 text-gray-500">
+              <svg className="h-5 w-5" viewBox="0 0 20 20" fill="currentColor" aria-hidden="true">
+                <path fillRule="evenodd" d="M5.23 7.21a.75.75 0 011.06.02L10 11.168l3.71-3.938a.75.75 0 111.08 1.04l-4.25 4.5a.75.75 0 01-1.08 0l-4.25-4.5a.75.75 0 01.02-1.06z" clipRule="evenodd" />
+              </svg>
+            </div>
+          </div>
+          {errors.accountId && (
+            <p className="mt-1 text-sm text-red-400">{errors.accountId}</p>
+          )}
+        </div>
       </div>
       
       {/* Tags */}
-      <div>
-        <label htmlFor="tags" className="block text-sm font-medium mb-1">
+      <div className="space-y-2">
+        <label htmlFor="tags" className="block text-sm font-medium text-gray-300">
           Tags
         </label>
         <div className="flex items-center space-x-2">
@@ -293,32 +318,31 @@ export default function TransactionForm({ transaction, onSubmit, onCancel }: Tra
             onChange={e => setTagInput(e.target.value)}
             onKeyDown={handleTagKeyDown}
             placeholder="Add tags and press Enter"
-            className="block w-full rounded-md border-gray-300 shadow-sm focus:border-primary-500 focus:ring-primary-500 dark:bg-gray-700 dark:border-gray-600 dark:text-white"
+            className="py-3 px-4 block w-full rounded-lg border-0 bg-gray-700 text-white placeholder-gray-400 focus:ring-1 focus:ring-primary-500 shadow-sm"
           />
           <button
             type="button"
             onClick={addTag}
-            className="inline-flex items-center px-3 py-1.5 border border-transparent text-sm leading-4 font-medium rounded text-white bg-primary-600 hover:bg-primary-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-primary-500"
+            className="inline-flex items-center px-3 py-3 border border-transparent text-sm font-medium rounded-lg text-white bg-primary-600 hover:bg-primary-700 focus:outline-none focus:ring-2 focus:ring-primary-500"
           >
-            <PlusIcon className="h-4 w-4 mr-1" />
-            Add
+            <PlusIcon className="h-5 w-5" />
           </button>
         </div>
         
         {form.tags.length > 0 && (
-          <div className="mt-2 flex flex-wrap gap-2">
+          <div className="mt-3 flex flex-wrap gap-2">
             {form.tags.map(tag => (
               <span
                 key={tag}
-                className="inline-flex items-center px-2.5 py-0.5 rounded-md text-sm font-medium bg-primary-100 text-primary-800 dark:bg-primary-700 dark:text-primary-100"
+                className="inline-flex items-center px-3 py-1.5 rounded-full text-sm font-medium bg-gray-700 text-gray-200"
               >
                 {tag}
                 <button
                   type="button"
                   onClick={() => removeTag(tag)}
-                  className="ml-1.5 inline-flex h-4 w-4 items-center justify-center rounded-full text-primary-400 hover:bg-primary-200 hover:text-primary-500 focus:outline-none focus:bg-primary-500 focus:text-white dark:hover:bg-primary-600"
+                  className="ml-1.5 text-gray-400 hover:text-gray-200"
                 >
-                  <XMarkIcon className="h-3 w-3" />
+                  <XMarkIcon className="h-4 w-4" />
                 </button>
               </span>
             ))}
@@ -327,8 +351,8 @@ export default function TransactionForm({ transaction, onSubmit, onCancel }: Tra
       </div>
       
       {/* Notes */}
-      <div>
-        <label htmlFor="notes" className="block text-sm font-medium mb-1">
+      <div className="space-y-2">
+        <label htmlFor="notes" className="block text-sm font-medium text-gray-300">
           Notes
         </label>
         <textarea
@@ -337,12 +361,13 @@ export default function TransactionForm({ transaction, onSubmit, onCancel }: Tra
           value={form.notes}
           onChange={handleChange}
           rows={3}
-          className="block w-full rounded-md border-gray-300 shadow-sm focus:border-primary-500 focus:ring-primary-500 dark:bg-gray-700 dark:border-gray-600 dark:text-white"
+          placeholder="Add any additional notes..."
+          className="py-3 px-4 block w-full rounded-lg border-0 bg-gray-700 text-white placeholder-gray-400 focus:ring-1 focus:ring-primary-500 shadow-sm resize-none"
         />
       </div>
       
       {/* Recurring Transaction */}
-      <div>
+      <div className="pt-3">
         <div className="flex items-center">
           <input
             id="isRecurring"
@@ -350,62 +375,74 @@ export default function TransactionForm({ transaction, onSubmit, onCancel }: Tra
             type="checkbox"
             checked={form.isRecurring}
             onChange={handleChange}
-            className="h-4 w-4 text-primary-600 focus:ring-primary-500 border-gray-300 rounded"
+            className="h-5 w-5 text-primary-600 focus:ring-primary-500 border-gray-500 rounded bg-gray-700"
           />
-          <label htmlFor="isRecurring" className="ml-2 block text-sm text-gray-900 dark:text-gray-100">
+          <label htmlFor="isRecurring" className="ml-2 block text-sm text-gray-300">
             This is a recurring transaction
           </label>
         </div>
         
         {form.isRecurring && (
-          <div className="mt-4 grid grid-cols-1 md:grid-cols-2 gap-4">
-            <div>
-              <label htmlFor="recurringFrequency" className="block text-sm font-medium mb-1">
+          <div className="mt-4 grid grid-cols-1 md:grid-cols-2 gap-4 pl-7">
+            <div className="space-y-2">
+              <label htmlFor="recurringFrequency" className="block text-sm font-medium text-gray-300">
                 Frequency
               </label>
-              <select
-                id="recurringFrequency"
-                name="recurringFrequency"
-                value={form.recurringFrequency}
-                onChange={handleChange}
-                className="block w-full rounded-md border-gray-300 shadow-sm focus:border-primary-500 focus:ring-primary-500 dark:bg-gray-700 dark:border-gray-600 dark:text-white"
-              >
-                <option value="daily">Daily</option>
-                <option value="weekly">Weekly</option>
-                <option value="monthly">Monthly</option>
-                <option value="yearly">Yearly</option>
-              </select>
+              <div className="relative">
+                <select
+                  id="recurringFrequency"
+                  name="recurringFrequency"
+                  value={form.recurringFrequency}
+                  onChange={handleChange}
+                  className="py-3 px-4 block w-full appearance-none rounded-lg border-0 bg-gray-700 text-white focus:ring-1 focus:ring-primary-500 shadow-sm pr-10"
+                >
+                  <option value="daily">Daily</option>
+                  <option value="weekly">Weekly</option>
+                  <option value="monthly">Monthly</option>
+                  <option value="yearly">Yearly</option>
+                </select>
+                <div className="pointer-events-none absolute inset-y-0 right-0 flex items-center px-3 text-gray-500">
+                  <svg className="h-5 w-5" viewBox="0 0 20 20" fill="currentColor" aria-hidden="true">
+                    <path fillRule="evenodd" d="M5.23 7.21a.75.75 0 011.06.02L10 11.168l3.71-3.938a.75.75 0 111.08 1.04l-4.25 4.5a.75.75 0 01-1.08 0l-4.25-4.5a.75.75 0 01.02-1.06z" clipRule="evenodd" />
+                  </svg>
+                </div>
+              </div>
             </div>
             
-            <div>
-              <label htmlFor="recurringEndDate" className="block text-sm font-medium mb-1">
+            <div className="space-y-2">
+              <label htmlFor="recurringEndDate" className="block text-sm font-medium text-gray-300">
                 End Date (Optional)
               </label>
-              <input
-                type="date"
-                id="recurringEndDate"
-                name="recurringEndDate"
-                value={form.recurringEndDate}
-                onChange={handleChange}
-                className="block w-full rounded-md border-gray-300 shadow-sm focus:border-primary-500 focus:ring-primary-500 dark:bg-gray-700 dark:border-gray-600 dark:text-white"
-              />
+              <div className="relative">
+                <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
+                  <CalendarIcon className="h-5 w-5 text-gray-500" />
+                </div>
+                <input
+                  type="date"
+                  id="recurringEndDate"
+                  name="recurringEndDate"
+                  value={form.recurringEndDate}
+                  onChange={handleChange}
+                  className="pl-10 py-3 block w-full rounded-lg border-0 bg-gray-700 text-white focus:ring-1 focus:ring-primary-500 shadow-sm"
+                />
+              </div>
             </div>
           </div>
         )}
       </div>
       
       {/* Form Actions */}
-      <div className="flex justify-end space-x-3">
+      <div className="flex justify-end space-x-4 pt-4 mt-6 border-t border-gray-700">
         <button
           type="button"
           onClick={onCancel}
-          className="inline-flex items-center px-4 py-2 border border-gray-300 shadow-sm text-sm font-medium rounded-md text-gray-700 bg-white hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-primary-500 dark:bg-gray-700 dark:text-gray-300 dark:border-gray-600 dark:hover:bg-gray-600"
+          className="px-5 py-2.5 border border-gray-600 rounded-lg text-sm font-medium text-gray-300 hover:bg-gray-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-gray-500"
         >
           Cancel
         </button>
         <button
           type="submit"
-          className="inline-flex items-center px-4 py-2 border border-transparent text-sm font-medium rounded-md shadow-sm text-white bg-primary-600 hover:bg-primary-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-primary-500"
+          className="px-5 py-2.5 border border-transparent rounded-lg text-sm font-medium text-white bg-primary-600 hover:bg-primary-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-primary-500"
         >
           {transaction ? 'Update' : 'Add'} Transaction
         </button>

@@ -304,7 +304,7 @@ export default function Accounts() {
   return (
     <div className="space-y-6">
       <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4">
-        <h1 className="text-2xl font-bold text-gray-900 dark:text-white">Accounts</h1>
+        <h1 className="text-2xl font-bold text-gray-900 dark:text-white mt-4">Accounts</h1>
         <button
           type="button"
           className="inline-flex items-center px-4 py-2 border border-transparent text-sm font-medium rounded-md shadow-sm text-white bg-primary-600 hover:bg-primary-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-primary-500"
