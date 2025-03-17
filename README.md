@@ -38,8 +38,8 @@ A comprehensive budget tracking application built with React, TypeScript, and Ta
 1. Clone the repository
 
    ```bash
-   git clone https://github.com/yourusername/budget-tracker.git
-   cd budget-tracker
+   git clone https://github.com/byigitt/budget.git
+   cd budget
    ```
 
 2. Install dependencies
@@ -83,7 +83,6 @@ budget-tracker/
 │   ├── App.tsx         # Main app component
 │   ├── main.tsx        # Entry point
 │   └── index.css       # Global styles
-├── .cursorrules        # Project rules
 ├── index.html          # HTML template
 ├── package.json        # Dependencies and scripts
 ├── tailwind.config.js  # TailwindCSS configuration
