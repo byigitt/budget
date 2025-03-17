@@ -7,10 +7,14 @@ import {
   MagnifyingGlassIcon
 } from '@heroicons/react/24/outline';
 import { useAppContext } from '../../contexts/AppContext';
+import Modal from '../UI/Modal';
+import TransactionForm from '../Transactions/TransactionForm';
+import { Transaction } from '../../types';
 
 export default function Header() {
-  const { settings, updateSettings } = useAppContext();
+  const { settings, updateSettings, addTransaction } = useAppContext();
   const [showNotifications, setShowNotifications] = useState(false);
+  const [showTransactionModal, setShowTransactionModal] = useState(false);
   
   const toggleTheme = () => {
     const newTheme = settings.theme === 'dark' ? 'light' : 'dark';
@@ -22,6 +26,11 @@ export default function Header() {
     } else {
       document.documentElement.classList.remove('dark');
     }
+  };
+
+  const handleTransactionSubmit = (transaction: Omit<Transaction, 'id'>) => {
+    addTransaction(transaction);
+    setShowTransactionModal(false);
   };
   
   return (
@@ -44,6 +53,7 @@ export default function Header() {
           <button
             type="button"
             className="bg-primary-600 hover:bg-primary-700 text-white py-1.5 px-3 rounded-lg flex items-center text-sm font-medium transition duration-150"
+            onClick={() => setShowTransactionModal(true)}
           >
             <PlusIcon className="w-4 h-4 mr-1.5" />
             <span>Add Transaction</span>
@@ -113,6 +123,19 @@ export default function Header() {
           </div>
         </div>
       </div>
+
+      {/* Transaction Modal */}
+      <Modal
+        isOpen={showTransactionModal}
+        onClose={() => setShowTransactionModal(false)}
+        title="Add Transaction"
+        size="lg"
+      >
+        <TransactionForm 
+          onSubmit={handleTransactionSubmit} 
+          onCancel={() => setShowTransactionModal(false)} 
+        />
+      </Modal>
     </header>
   );
 } 

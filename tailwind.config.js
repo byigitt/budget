@@ -43,6 +43,15 @@ export default {
           "0 4px 12px rgba(0, 0, 0, 0.12), 0 2px 4px rgba(0, 0, 0, 0.08)",
         subtle: "0 1px 2px rgba(0, 0, 0, 0.06)",
       },
+      keyframes: {
+        fadeIn: {
+          "0%": { opacity: "0", transform: "translateY(10px)" },
+          "100%": { opacity: "1", transform: "translateY(0)" },
+        },
+      },
+      animation: {
+        fadeIn: "fadeIn 0.2s ease-out forwards",
+      },
     },
   },
   plugins: [],
