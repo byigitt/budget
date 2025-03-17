@@ -1,54 +1,104 @@
-# React + TypeScript + Vite
+# Budget Tracker
 
-This template provides a minimal setup to get React working in Vite with HMR and some ESLint rules.
+A comprehensive budget tracking application built with React, TypeScript, and TailwindCSS.
 
-Currently, two official plugins are available:
+## Features
 
-- [@vitejs/plugin-react](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react/README.md) uses [Babel](https://babeljs.io/) for Fast Refresh
-- [@vitejs/plugin-react-swc](https://github.com/vitejs/vite-plugin-react-swc) uses [SWC](https://swc.rs/) for Fast Refresh
+- 📊 **Dashboard** - Get a quick overview of your financial status
+- 💰 **Transaction Management** - Track income, expenses, and transfers
+- 📋 **Budget Planning** - Set and track budget goals
+- 🏦 **Account Management** - Manage multiple accounts in one place
+- 📈 **Reports and Analytics** - Visualize your spending patterns
+- 📱 **Responsive Design** - Works on desktop and mobile devices
+- 🌓 **Dark Mode** - Easy on the eyes, day or night
+- 📷 **Receipt Scanning** - Capture and store receipts
+- 📊 **Forecasting** - Predict future financial status
+- 💾 **Data Backup** - Export and import your financial data
 
-## Expanding the ESLint configuration
+## Tech Stack
 
-If you are developing a production application, we recommend updating the configuration to enable type-aware lint rules:
+- **React** - UI library
+- **TypeScript** - Type safety
+- **Vite** - Build tool
+- **TailwindCSS** - Styling
+- **React Router** - Navigation
+- **Recharts** - Data visualization
+- **date-fns** - Date manipulation
+- **localStorage** - Data persistence
 
-```js
-export default tseslint.config({
-  extends: [
-    // Remove ...tseslint.configs.recommended and replace with this
-    ...tseslint.configs.recommendedTypeChecked,
-    // Alternatively, use this for stricter rules
-    ...tseslint.configs.strictTypeChecked,
-    // Optionally, add this for stylistic rules
-    ...tseslint.configs.stylisticTypeChecked,
-  ],
-  languageOptions: {
-    // other options...
-    parserOptions: {
-      project: ['./tsconfig.node.json', './tsconfig.app.json'],
-      tsconfigRootDir: import.meta.dirname,
-    },
-  },
-})
+## Getting Started
+
+### Prerequisites
+
+- Node.js (v18 or higher)
+- pnpm (v8 or higher)
+
+### Installation
+
+1. Clone the repository
+
+   ```bash
+   git clone https://github.com/yourusername/budget-tracker.git
+   cd budget-tracker
+   ```
+
+2. Install dependencies
+
+   ```bash
+   pnpm install
+   ```
+
+3. Start the development server
+
+   ```bash
+   pnpm dev
+   ```
+
+4. Open your browser and navigate to `http://localhost:5173`
+
+## Building for Production
+
+```bash
+pnpm build
 ```
 
-You can also install [eslint-plugin-react-x](https://github.com/Rel1cx/eslint-react/tree/main/packages/plugins/eslint-plugin-react-x) and [eslint-plugin-react-dom](https://github.com/Rel1cx/eslint-react/tree/main/packages/plugins/eslint-plugin-react-dom) for React-specific lint rules:
+The build artifacts will be stored in the `dist/` directory.
 
-```js
-// eslint.config.js
-import reactX from 'eslint-plugin-react-x'
-import reactDom from 'eslint-plugin-react-dom'
+## Project Structure
 
-export default tseslint.config({
-  plugins: {
-    // Add the react-x and react-dom plugins
-    'react-x': reactX,
-    'react-dom': reactDom,
-  },
-  rules: {
-    // other rules...
-    // Enable its recommended typescript rules
-    ...reactX.configs['recommended-typescript'].rules,
-    ...reactDom.configs.recommended.rules,
-  },
-})
 ```
+budget-tracker/
+├── public/             # Static assets
+├── src/
+│   ├── components/     # Reusable components
+│   │   ├── Dashboard/  # Dashboard components
+│   │   ├── Layout/     # Layout components
+│   │   ├── Transactions/ # Transaction components
+│   │   └── UI/         # UI components
+│   ├── contexts/       # React contexts
+│   ├── hooks/          # Custom hooks
+│   ├── pages/          # Page components
+│   ├── types/          # TypeScript types
+│   ├── utils/          # Utility functions
+│   ├── App.tsx         # Main app component
+│   ├── main.tsx        # Entry point
+│   └── index.css       # Global styles
+├── .cursorrules        # Project rules
+├── index.html          # HTML template
+├── package.json        # Dependencies and scripts
+├── tailwind.config.js  # TailwindCSS configuration
+├── tsconfig.json       # TypeScript configuration
+└── vite.config.ts      # Vite configuration
+```
+
+## Data Privacy
+
+All your financial data is stored locally in your browser's localStorage. No data is sent to any server.
+
+## Contributing
+
+Contributions are welcome! Please feel free to submit a Pull Request.
+
+## License
+
+This project is licensed under the MIT License - see the LICENSE file for details.
