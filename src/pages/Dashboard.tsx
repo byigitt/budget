@@ -8,7 +8,6 @@ import { PieChart, Pie, Cell, ResponsiveContainer, Tooltip } from 'recharts';
 
 import Card from '../components/UI/Card';
 import OverviewCard from '../components/Dashboard/OverviewCard';
-import TransactionList from '../components/Transactions/TransactionList';
 import { useAppContext } from '../contexts/AppContext';
 import { formatCurrency } from '../utils/format';
 
@@ -46,17 +45,18 @@ export default function Dashboard() {
   return (
     <div className="space-y-6">
       <div>
-        <h1 className="text-2xl font-bold text-gray-900 dark:text-white mb-1">Dashboard</h1>
-        <p className="text-gray-500 dark:text-gray-400">Your financial overview</p>
+        <h1 className="text-xl font-medium text-gray-900 dark:text-white mb-1">Dashboard</h1>
+        <p className="text-sm text-gray-500 dark:text-gray-400">Your financial overview</p>
       </div>
       
       {/* Financial summary */}
-      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
+      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-5">
         <OverviewCard
           title="Total Balance"
           value={formatCurrency(accounts.reduce((sum, account) => sum + account.balance, 0))}
           icon={<WalletIcon />}
           change={{ value: 3.2, isPositive: true }}
+          color="primary"
         />
         
         <OverviewCard
@@ -85,7 +85,7 @@ export default function Dashboard() {
       </div>
       
       {/* Charts and recent transactions */}
-      <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
+      <div className="grid grid-cols-1 lg:grid-cols-3 gap-5">
         {/* Expense by category */}
         <Card
           title="Expenses by Category"
@@ -101,11 +101,10 @@ export default function Dashboard() {
                     nameKey="name"
                     cx="50%"
                     cy="50%"
-                    outerRadius={80}
+                    outerRadius={70}
                     innerRadius={40}
                     paddingAngle={2}
-                    label={(entry) => entry.name}
-                    labelLine={false}
+                    cornerRadius={4}
                   >
                     {expenseByCategory.map((entry, index) => (
                       <Cell key={`cell-${index}`} fill={entry.color} />
@@ -113,6 +112,12 @@ export default function Dashboard() {
                   </Pie>
                   <Tooltip 
                     formatter={(value: number) => formatCurrency(value)} 
+                    contentStyle={{ 
+                      borderRadius: '8px',
+                      border: '1px solid #eceef2',
+                      boxShadow: '0 1px 3px rgba(0, 0, 0, 0.08)',
+                      backgroundColor: 'white'
+                    }}
                   />
                 </PieChart>
               </ResponsiveContainer>
@@ -128,7 +133,7 @@ export default function Dashboard() {
               <div key={index} className="flex items-center justify-between">
                 <div className="flex items-center">
                   <div 
-                    className="w-3 h-3 rounded-full mr-2" 
+                    className="w-2.5 h-2.5 rounded-sm mr-2" 
                     style={{ backgroundColor: category.color }}
                   ></div>
                   <span className="text-sm text-gray-700 dark:text-gray-300">
@@ -148,43 +153,43 @@ export default function Dashboard() {
           title="Budget Progress"
           className="lg:col-span-1"
         >
-          <div className="space-y-8">
+          <div className="space-y-6">
             <div>
-              <div className="flex justify-between mb-1 text-sm">
+              <div className="flex justify-between mb-1.5 text-sm">
                 <span className="text-gray-700 dark:text-gray-300">Overall Budget</span>
                 <span className="text-gray-900 dark:text-white font-medium">{budgetProgress.toFixed(1)}%</span>
               </div>
-              <div className="w-full bg-gray-200 dark:bg-gray-700 rounded-full h-2.5">
+              <div className="w-full bg-gray-200 dark:bg-gray-700 rounded-full h-1.5">
                 <div
-                  className={`h-2.5 rounded-full ${
-                    budgetProgress > 90 ? 'bg-red-500' : budgetProgress > 70 ? 'bg-yellow-500' : 'bg-green-500'
+                  className={`h-1.5 rounded-full ${
+                    budgetProgress > 90 ? 'bg-expense' : budgetProgress > 70 ? 'bg-yellow-500' : 'bg-income'
                   }`}
                   style={{ width: `${Math.min(budgetProgress, 100)}%` }}
                 ></div>
               </div>
-              <div className="flex justify-between mt-1 text-xs text-gray-500 dark:text-gray-400">
+              <div className="flex justify-between mt-1.5 text-xs text-gray-500 dark:text-gray-400">
                 <span>Spent: {formatCurrency(totalSpent)}</span>
                 <span>Budget: {formatCurrency(totalAllocated)}</span>
               </div>
             </div>
             
             {/* Individual budget goals */}
-            <div className="space-y-6">
-              <h4 className="text-sm font-medium text-gray-900 dark:text-white">Budget Goals</h4>
+            <div className="space-y-5">
+              <h4 className="text-xs font-medium text-gray-500 dark:text-gray-400">Budget Goals</h4>
               
               {budgetGoals.length > 0 ? (
                 budgetGoals.slice(0, 3).map((goal) => {
                   const progress = (goal.currentAmount / goal.targetAmount) * 100;
                   
                   return (
-                    <div key={goal.id} className="space-y-1">
+                    <div key={goal.id} className="space-y-1.5">
                       <div className="flex justify-between mb-1 text-sm">
                         <span className="text-gray-700 dark:text-gray-300">{goal.name}</span>
                         <span className="text-gray-900 dark:text-white font-medium">{progress.toFixed(1)}%</span>
                       </div>
-                      <div className="w-full bg-gray-200 dark:bg-gray-700 rounded-full h-2.5">
+                      <div className="w-full bg-gray-200 dark:bg-gray-700 rounded-full h-1.5">
                         <div
-                          className="h-2.5 rounded-full"
+                          className="h-1.5 rounded-full"
                           style={{ 
                             width: `${Math.min(progress, 100)}%`,
                             backgroundColor: goal.color 
@@ -199,7 +204,7 @@ export default function Dashboard() {
                   );
                 })
               ) : (
-                <div className="text-center text-gray-500 dark:text-gray-400 py-4">
+                <div className="text-center text-gray-500 dark:text-gray-400 py-4 text-sm">
                   No budget goals set
                 </div>
               )}
@@ -215,7 +220,7 @@ export default function Dashboard() {
             <div className="text-center">
               <a 
                 href="/transactions" 
-                className="text-primary-500 hover:text-primary-600 text-sm font-medium hover:underline"
+                className="text-primary-600 dark:text-primary-400 text-sm font-medium hover:underline"
               >
                 View all transactions
               </a>
@@ -223,24 +228,24 @@ export default function Dashboard() {
           }
         >
           {dashboardData.recentTransactions.length > 0 ? (
-            <div className="space-y-4">
+            <div className="space-y-3">
               {dashboardData.recentTransactions.map((transaction) => {
                 const category = categories.find(c => c.id === transaction.categoryId);
                 const isIncome = transaction.type === 'income';
                 
                 return (
-                  <div key={transaction.id} className="flex justify-between items-center">
+                  <div key={transaction.id} className="flex justify-between items-center p-2 hover:bg-gray-50 dark:hover:bg-gray-800/40 rounded-lg">
                     <div className="flex items-center">
                       <div 
-                        className="w-8 h-8 rounded-full flex items-center justify-center"
-                        style={{ backgroundColor: category?.color || '#CBD5E1' }}
+                        className="w-7 h-7 rounded-lg flex items-center justify-center"
+                        style={{ backgroundColor: category?.color || '#64748b' }}
                       >
-                        <span className="text-white text-xs">
+                        <span className="text-white text-xs font-medium">
                           {category?.name.substring(0, 2).toUpperCase() || 'TX'}
                         </span>
                       </div>
                       <div className="ml-3">
-                        <p className="text-sm font-medium text-gray-900 dark:text-white">
+                        <p className="text-sm font-medium text-gray-800 dark:text-gray-200">
                           {transaction.description}
                         </p>
                         <p className="text-xs text-gray-500 dark:text-gray-400">
@@ -256,7 +261,7 @@ export default function Dashboard() {
               })}
             </div>
           ) : (
-            <div className="text-center text-gray-500 dark:text-gray-400 py-4">
+            <div className="text-center text-gray-500 dark:text-gray-400 py-4 text-sm">
               No recent transactions
             </div>
           )}

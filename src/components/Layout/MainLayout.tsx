@@ -28,12 +28,14 @@ export default function MainLayout({ children }: MainLayoutProps) {
   }, [settings.theme]);
 
   return (
-    <div className="flex h-screen bg-gray-50 dark:bg-gray-900">
+    <div className="flex h-screen bg-background-light dark:bg-background-dark">
       <Sidebar />
       <div className="flex-1 ml-64">
         <Header />
-        <main className="pt-16 px-6 pb-6 min-h-screen">
-          {children}
+        <main className="pt-16 pb-6 px-6 min-h-screen">
+          <div className="mx-auto max-w-[1600px]">
+            {children}
+          </div>
         </main>
       </div>
     </div>
