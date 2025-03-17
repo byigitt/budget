@@ -9,8 +9,10 @@ export interface Transaction {
   categoryId: string;
   accountId: string;
   tags: string[];
+  notes?: string;
   isRecurring: boolean;
-  recurringDetails?: RecurringDetails;
+  recurringFrequency?: "daily" | "weekly" | "monthly" | "yearly";
+  recurringEndDate?: string;
   receiptUrl?: string;
 }
 
